@@ -31,6 +31,7 @@ export default function PlaceOrderForm({
   const [shippingState, setShippingState] = useState("");
   const [promoUsed, setPromoUsed] = useState(false);
   const [promoCode, setPromoCode] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const priceById = useMemo(() => {
     return new Map(products.map((p) => [p.product_id, p.price] as const));
@@ -68,28 +69,39 @@ export default function PlaceOrderForm({
 
   const canSubmit = customerId > 0 && lines.length > 0 && lines.every((l) => l.quantity > 0);
 
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!canSubmit || isSubmitting) return;
+
+    const cleaned = lines
+      .map((l) => ({
+        product_id: Number(l.product_id),
+        quantity: clampInt(Number(l.quantity), 1, 99),
+      }))
+      .filter((l) => Number.isFinite(l.product_id) && l.product_id > 0);
+
+    setIsSubmitting(true);
+    try {
+      await createOrderAction({
+        customerId,
+        lines: cleaned,
+        paymentMethod,
+        deviceType,
+        ipCountry,
+        shippingState: shippingState || null,
+        promoUsed,
+        promoCode: promoUsed ? promoCode || null : null,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <form
       className="rounded-lg border bg-white p-4 text-black"
-      action={async () => {
-        const cleaned = lines
-          .map((l) => ({
-            product_id: Number(l.product_id),
-            quantity: clampInt(Number(l.quantity), 1, 99),
-          }))
-          .filter((l) => Number.isFinite(l.product_id) && l.product_id > 0);
-
-        await createOrderAction({
-          customerId,
-          lines: cleaned,
-          paymentMethod,
-          deviceType,
-          ipCountry,
-          shippingState: shippingState || null,
-          promoUsed,
-          promoCode: promoUsed ? promoCode || null : null,
-        });
-      }}
+      method="post"
+      onSubmit={handleSubmit}
     >
       <div className="text-sm font-medium text-black">Line items</div>
       <div className="mt-3 space-y-3">
@@ -240,9 +252,9 @@ export default function PlaceOrderForm({
         <button
           type="submit"
           className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
-          disabled={!canSubmit}
+          disabled={!canSubmit || isSubmitting}
         >
-          Create order
+          {isSubmitting ? "Creating…" : "Create order"}
         </button>
       </div>
     </form>
