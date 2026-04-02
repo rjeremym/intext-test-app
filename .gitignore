@@ -1,0 +1,28 @@
+# Next.js app lives in web/
+web/node_modules/
+web/.next/
+web/out/
+web/build/
+web/.vercel/
+web/.env
+web/.env.local
+web/.env.development.local
+web/.env.test.local
+web/.env.production.local
+web/coverage/
+web/*.tsbuildinfo
+web/next-env.d.ts
+web/npm-debug.log*
+web/yarn-debug.log*
+web/yarn-error.log*
+web/.pnpm-debug.log*
+
+# Supabase CLI local temp
+supabase/.temp/
+
+# Root / OS
+.DS_Store
+*.pem
+.env
+.env.local
+.env.*.local
