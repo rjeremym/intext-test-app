@@ -5,7 +5,16 @@ import PlaceOrderForm from "./placeOrderForm";
 
 export const dynamic = "force-dynamic";
 
-export default async function PlaceOrderPage() {
+export default async function PlaceOrderPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+  const orderErr = typeof sp.error === "string" ? sp.error : undefined;
+  const orderDetail =
+    typeof sp.detail === "string" ? decodeURIComponent(sp.detail) : undefined;
+
   const customerId = await getSelectedCustomerId();
   if (!customerId) redirect("/select-customer");
 
@@ -43,6 +52,15 @@ export default async function PlaceOrderPage() {
       {productsError ? (
         <div className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
           Failed to load products: {productsError.message}
+        </div>
+      ) : null}
+
+      {orderErr ? (
+        <div className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          <div className="font-medium">Could not create order ({orderErr})</div>
+          {orderDetail ? (
+            <p className="mt-2 whitespace-pre-wrap">{orderDetail}</p>
+          ) : null}
         </div>
       ) : null}
 

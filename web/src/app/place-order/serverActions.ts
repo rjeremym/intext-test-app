@@ -86,13 +86,26 @@ export async function createOrderAction(input: CreateOrderInput) {
       is_fraud: 0,
     })
     .select("order_id")
-    .limit(1);
+    .single();
 
-  if (orderError || !insertedOrders?.[0]?.order_id) {
-    redirect(`/place-order?error=order_insert`);
+  const orderIdRaw = insertedOrders?.order_id;
+  const orderId =
+    typeof orderIdRaw === "bigint"
+      ? Number(orderIdRaw)
+      : Number(orderIdRaw ?? NaN);
+
+  if (orderError) {
+    redirect(
+      `/place-order?error=order_insert&detail=${encodeURIComponent(orderError.message)}`,
+    );
   }
-
-  const orderId = insertedOrders[0].order_id as number;
+  if (!Number.isFinite(orderId) || orderId <= 0) {
+    redirect(
+      `/place-order?error=order_insert&detail=${encodeURIComponent(
+        "No order_id returned. Often: wrong Vercel key (use service_role, not anon) or RLS blocking RETURNING. Run latest Supabase migration disable_rls_operational_tables.sql.",
+      )}`,
+    );
+  }
 
   const itemsPayload = normalizedLines.map((l) => {
     const unitPrice = priceById.get(l.product_id) ?? 0;
