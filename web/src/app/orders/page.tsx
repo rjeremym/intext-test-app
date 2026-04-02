@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { formatOrderDatetime } from "@/lib/formatOrderDatetime";
 import { getSelectedCustomerId } from "@/server/customerCookie";
 import { supabaseAdmin } from "@/server/supabaseAdmin";
 
@@ -76,7 +77,9 @@ export default async function OrdersPage() {
                     #{o.order_id}
                   </Link>
                 </td>
-                <td className="px-4 py-2">{o.order_datetime}</td>
+                <td className="px-4 py-2">
+                  {formatOrderDatetime(o.order_datetime)}
+                </td>
                 <td className="px-4 py-2">{o.payment_method}</td>
                 <td className="px-4 py-2">{o.device_type}</td>
                 <td className="px-4 py-2 text-right">

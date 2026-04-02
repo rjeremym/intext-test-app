@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { formatOrderDatetime } from "@/lib/formatOrderDatetime";
 import { getSelectedCustomerId } from "@/server/customerCookie";
 import { supabaseAdmin } from "@/server/supabaseAdmin";
 
@@ -85,7 +86,9 @@ export default async function DashboardPage() {
               {(orders ?? []).map((o) => (
                 <tr key={o.order_id} className="border-t">
                   <td className="px-4 py-2 font-medium">#{o.order_id}</td>
-                  <td className="px-4 py-2">{o.order_datetime}</td>
+                  <td className="px-4 py-2">
+                    {formatOrderDatetime(o.order_datetime)}
+                  </td>
                   <td className="px-4 py-2 text-right">
                     ${Number(o.order_total).toFixed(2)}
                   </td>

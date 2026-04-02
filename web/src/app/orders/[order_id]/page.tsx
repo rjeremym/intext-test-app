@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatOrderDatetime } from "@/lib/formatOrderDatetime";
 import { supabaseAdmin } from "@/server/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
@@ -74,7 +75,9 @@ export default async function OrderDetailPage({
             <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <div>
                 <dt className="text-xs text-black">Order datetime</dt>
-                <dd className="mt-1 font-medium">{order.order_datetime}</dd>
+                <dd className="mt-1 font-medium">
+                  {formatOrderDatetime(order.order_datetime)}
+                </dd>
               </div>
               <div>
                 <dt className="text-xs text-black">Total</dt>

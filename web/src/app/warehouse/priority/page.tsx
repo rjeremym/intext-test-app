@@ -1,3 +1,4 @@
+import { formatOrderDatetime } from "@/lib/formatOrderDatetime";
 import { supabaseAdmin } from "@/server/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
@@ -73,7 +74,9 @@ export default async function WarehousePriorityPage() {
                 <td className="px-4 py-2">
                   {r.customer_name || `Customer #${r.customer_id}`}
                 </td>
-                <td className="px-4 py-2">{r.order_datetime}</td>
+                <td className="px-4 py-2">
+                  {formatOrderDatetime(r.order_datetime)}
+                </td>
                 <td className="px-4 py-2 text-right">
                   ${Number(r.order_total).toFixed(2)}
                 </td>
